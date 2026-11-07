@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What's Missing? Celebrations</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: classroom board — papel picado banner, one big "next step" button, 4x3 card grid, team scoreboard below */
+:root{
+  --bg:#f3f0fa; --card:#ffffff; --ink:#251d3f; --soft:#6b6288;
+  --accent:#e0457f; --accent2:#f5a400; --ok:#1c9a60; --line:#dcd3ef; --gap:#e8e1f6;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#19152b; --card:#262041; --ink:#f4f0ff; --soft:#aaa1c9;
+  --accent:#ff6fa3; --accent2:#ffc54a; --ok:#4fd38f; --line:#3c345e; --gap:#2f2850; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#19152b; --card:#262041; --ink:#f4f0ff; --soft:#aaa1c9;
+  --accent:#ff6fa3; --accent2:#ffc54a; --ok:#4fd38f; --line:#3c345e; --gap:#2f2850; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 28px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+.picado{display:flex;justify-content:center;gap:4px;overflow:hidden;height:26px;margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)))}
+.picado i{flex:0 0 34px;height:26px;clip-path:polygon(0 0,100% 0,50% 100%);opacity:.9}
+.picado i:nth-child(4n+1){background:var(--accent)}
+.picado i:nth-child(4n+2){background:var(--accent2)}
+.picado i:nth-child(4n+3){background:var(--ok)}
+.picado i:nth-child(4n){background:var(--soft)}
+
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,4.5vw,2.6rem);line-height:1;margin:0;text-wrap:balance}
+h1 span{color:var(--accent)}
+.topic{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--soft)}
+select{font:inherit;font-weight:700;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:12px;padding:6px 10px}
+
+.stage{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+#main{font-family:var(--display);font-weight:800;font-size:clamp(1.2rem,3vw,1.6rem);border:0;border-radius:18px;
+  padding:12px 26px;background:var(--accent);color:#fff;cursor:pointer;box-shadow:0 5px 0 color-mix(in srgb,var(--accent) 60%,#000);
+  transition:transform .08s,box-shadow .08s;flex:1 1 260px}
+#main:active{transform:translateY(4px);box-shadow:0 1px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+#main:disabled{opacity:.55;cursor:wait}
+.steps{display:flex;gap:6px;font-weight:800;font-size:.85rem;color:var(--soft)}
+.steps b{padding:4px 10px;border-radius:999px;border:2px solid var(--line)}
+.steps b.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools button,.seg button{font:inherit;font-weight:700;font-size:.95rem;color:var(--ink);background:var(--card);border:2px solid var(--line);
+  border-radius:999px;padding:7px 14px;cursor:pointer}
+.tools button[aria-pressed="true"]{border-color:var(--ok);color:var(--ok)}
+.seg{display:flex;align-items:center;gap:4px;padding-right:6px}
+.seg span{font-weight:700;color:var(--soft);margin-right:4px}
+.seg button{padding:7px 13px;min-width:40px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+
+.board{position:relative}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{font:inherit;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:20px;padding:10px 4px;min-height:clamp(104px,17vw,140px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:transform .15s}
+.card:hover{transform:translateY(-2px)}
+.card .e{font-size:clamp(2.2rem,7vw,3.8rem);line-height:1.1}
+.card .w{font-family:var(--display);font-weight:700;font-size:clamp(.95rem,2.4vw,1.3rem)}
+.card.gap{background:var(--gap);border-style:dashed;cursor:default}
+.card.gap .e{opacity:.55}
+.card.ans{border-color:var(--ok);box-shadow:0 0 0 4px var(--ok);animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.cover{position:absolute;inset:-6px;background:var(--ink);color:var(--bg);border-radius:22px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;z-index:2;text-align:center;padding:16px}
+.cover .big{font-family:var(--display);font-weight:800;font-size:clamp(4rem,16vw,9rem);line-height:1;color:var(--accent2)}
+.cover .say{font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,5vw,2.8rem)}
+
+#msg{font-family:var(--display);font-weight:700;font-size:clamp(1.15rem,3vw,1.5rem);min-height:1.6em;margin:0;text-align:center}
+.hint{margin:0;text-align:center;color:var(--soft);font-size:.9rem}
+kbd{font-family:var(--body);font-weight:800;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.team{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.team input{font:inherit;font-weight:800;color:var(--ink);background:transparent;border:0;border-bottom:2px dashed var(--line);width:100%;min-width:0;padding:2px 0}
+.team .pts{font-family:var(--display);font-weight:800;font-size:2rem;min-width:2ch;text-align:center;font-variant-numeric:tabular-nums}
+.team:first-child .pts{color:var(--accent)}
+.team:last-child .pts{color:var(--accent2)}
+.team button{font:inherit;font-weight:800;width:38px;height:38px;flex:0 0 38px;border-radius:50%;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+
+@media (max-width:560px){.grid{grid-template-columns:repeat(3,1fr);gap:8px}.teams{grid-template-columns:1fr}.steps{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="picado" id="picado" aria-hidden="true"></div>
+<div class="wrap">
+  <header>
+    <h1>What’s <span>Missing?</span> 🎉</h1>
+    <label class="topic" for="topic">Topic
+      <select id="topic"></select>
+    </label>
+  </header>
+
+  <div class="stage">
+    <button id="main" type="button">🙈 Close your eyes</button>
+    <div class="steps" aria-hidden="true"><b id="s1">1 Look</b><b id="s2">2 Hide</b><b id="s3">3 Guess</b><b id="s4">4 Answer</b></div>
+  </div>
+
+  <div class="tools">
+    <div class="seg" role="group" aria-label="Cards to remove"><span>Remove</span>
+      <button type="button" id="n1" data-n="1">1</button><button type="button" id="n2" data-n="2">2</button><button type="button" id="n3" data-n="3">3</button>
+    </div>
+    <button type="button" id="mix" aria-pressed="false">🔀 Mix each round</button>
+    <button type="button" id="shuf">Shuffle now</button>
+    <button type="button" id="snd" aria-pressed="true">🔊 Sound</button>
+    <button type="button" id="full">⛶ Full screen</button>
+    <button type="button" id="reset">↺ Reset</button>
+  </div>
+
+  <div class="board">
+    <div class="grid" id="grid"></div>
+    <div class="cover" id="cover" hidden><div class="big" id="big"></div><div class="say" id="say"></div></div>
+  </div>
+
+  <p id="msg" aria-live="polite">Look at the cards. Tap one to hear the word.</p>
+
+  <div class="teams">
+    <div class="team"><input id="t0" aria-label="Team 1 name" maxlength="20"><button type="button" data-t="0" data-d="-1" aria-label="Team 1 minus one">−</button><span class="pts" id="p0">0</span><button type="button" data-t="0" data-d="1" aria-label="Team 1 plus one">+</button></div>
+    <div class="team"><input id="t1" aria-label="Team 2 name" maxlength="20"><button type="button" data-t="1" data-d="-1" aria-label="Team 2 minus one">−</button><span class="pts" id="p1">0</span><button type="button" data-t="1" data-d="1" aria-label="Team 2 plus one">+</button></div>
+  </div>
+  <p class="hint">Keys: <kbd>Space</kbd> next step · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> cards to remove · <kbd>F</kbd> full screen</p>
+</div>
+
+<script>
+(function(){
+var SETS={
+  celebrations:{name:"Celebrations & Ceremonies",words:[["ceremony","💒"],["celebration","🎉"],["festival","🎪"],["dance","💃"],["music","🎵"],["ritual","🕯️"],["offering","🧺"],["harvest","🌾"],["new year","🎆"],["planting","🌱"],["gratitude","🙏"],["community","👨‍👩‍👧‍👦"]]},
+  party:{name:"Party Time",words:[["cake","🎂"],["balloon","🎈"],["gift","🎁"],["mask","🎭"],["drum","🥁"],["guitar","🎸"],["lantern","🏮"],["confetti","🎊"],["invitation","💌"],["piñata","🪅"],["crown","👑"],["candy","🍬"]]},
+  holidays:{name:"Special Days",words:[["birthday","🎂"],["wedding","💍"],["Christmas","🎄"],["Halloween","🎃"],["Easter","🐣"],["Valentine's Day","💝"],["Mother's Day","💐"],["graduation","🎓"],["carnival","🎭"],["Thanksgiving","🦃"],["picnic","🧺"],["fireworks","🎇"]]}
+};
+var $=function(id){return document.getElementById(id)};
+var grid=$("grid"),cover=$("cover"),big=$("big"),say=$("say"),msg=$("msg"),main=$("main");
+var store={get:function(k,d){try{var v=localStorage.getItem("wm-"+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+           set:function(k,v){try{localStorage.setItem("wm-"+k,JSON.stringify(v))}catch(e){}}};
+
+var setKey=store.get("set","celebrations"); if(!SETS[setKey])setKey="celebrations";
+var n=store.get("n",1), mix=store.get("mix",false), sound=store.get("sound",true);
+var teams=store.get("teams",[{name:"Team A",s:0},{name:"Team B",s:0}]);
+var order=SETS[setKey].words.slice(), missing=[], phase="study", busy=false, timers=[];
+
+// banner
+var p=$("picado"),h="";for(var i=0;i<40;i++)h+="<i></i>";p.innerHTML=h;
+
+// topics
+var sel=$("topic");
+Object.keys(SETS).forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=SETS[k].name;sel.appendChild(o)});
+sel.value=setKey;
+
+// audio
+var ctx=null;
+function tone(f,d,type,delay){
+  if(!sound)return;
+  try{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();
+    var t=ctx.currentTime+(delay||0),o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type||"sine";o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.22,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+d+.05);}catch(e){}
+}
+function chime(){tone(523,.25,"triangle",0);tone(659,.25,"triangle",.12);tone(784,.45,"triangle",.24)}
+function speak(w){
+  if(!sound)return;
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(w);u.lang="en-US";u.rate=.85;speechSynthesis.speak(u)}catch(e){}
+}
+
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+
+function render(){
+  var hide=(phase==="guess"),h="";
+  order.forEach(function(c,i){
+    var m=missing.indexOf(i)>-1;
+    if(m&&hide)h+='<div class="card gap" aria-label="missing card"><div class="e">❓</div><div class="w">&nbsp;</div></div>';
+    else h+='<button type="button" class="card'+(m&&phase==="answer"?" ans":"")+'" data-w="'+esc(c[0])+'"><span class="e">'+c[1]+'</span><span class="w">'+esc(c[0])+'</span></button>';
+  });
+  grid.innerHTML=h;
+  cover.hidden=(phase!=="covered");
+  var labels={study:"🙈 Close your eyes",covered:"👀 Open your eyes!",guess:"✅ Show the answer",answer:"▶ Next round"};
+  main.textContent=labels[phase];main.disabled=busy;
+  ["study","covered","guess","answer"].forEach(function(ph,i){$("s"+(i+1)).classList.toggle("on",ph===phase)});
+  [1,2,3].forEach(function(k){$("n"+k).setAttribute("aria-pressed",String(k===n))});
+  $("mix").setAttribute("aria-pressed",String(mix));
+  $("snd").setAttribute("aria-pressed",String(sound));$("snd").textContent=sound?"🔊 Sound":"🔇 Sound";
+  teams.forEach(function(t,i){$("p"+i).textContent=t.s;if(document.activeElement!==$("t"+i))$("t"+i).value=t.name});
+}
+
+function clearTimers(){timers.forEach(clearTimeout);timers=[];busy=false}
+
+function closeEyes(){
+  phase="covered";busy=true;missing=[];
+  say.textContent="Close your eyes!";big.textContent="🙈";msg.textContent="Close your eyes… no peeking!";render();
+  var seq=[3,2,1];
+  seq.forEach(function(num,i){timers.push(setTimeout(function(){big.textContent=num;tone(440,.15,"square");},700+i*900))});
+  timers.push(setTimeout(function(){
+    if(mix)shuffle(order);
+    var idx=shuffle(order.map(function(_,i){return i}));missing=idx.slice(0,n);
+    big.textContent="🤫";say.textContent="Ready!";tone(660,.3,"triangle");
+    busy=false;msg.textContent=n>1?n+" cards are hiding. Ready to look?":"One card is hiding. Ready to look?";render();
+  },700+seq.length*900));
+}
+function openEyes(){phase="guess";msg.textContent=n>1?"Open your eyes! What "+n+" things are missing?":"Open your eyes! What’s missing?";tone(880,.2,"sine");render()}
+function showAnswer(){
+  phase="answer";var ws=missing.map(function(i){return order[i][0]});
+  msg.textContent="Yes! "+(ws.length>1?ws.slice(0,-1).join(", ")+" and "+ws[ws.length-1]:ws[0])+". Well done!";
+  render();chime();setTimeout(function(){speak(ws.join(", "))},600);
+}
+function nextRound(){phase="study";missing=[];msg.textContent="Look carefully at the cards…";render()}
+
+function step(){
+  if(busy)return;
+  if(phase==="study")closeEyes();else if(phase==="covered")openEyes();else if(phase==="guess")showAnswer();else nextRound();
+}
+function resetAll(){clearTimers();order=SETS[setKey].words.slice();missing=[];phase="study";msg.textContent="Look at the cards. Tap one to hear the word.";render()}
+
+main.onclick=step;
+grid.addEventListener("click",function(e){var b=e.target.closest(".card[data-w]");if(b)speak(b.getAttribute("data-w"))});
+document.querySelectorAll(".seg button").forEach(function(b){b.onclick=function(){n=+b.getAttribute("data-n");store.set("n",n);render()}});
+$("mix").onclick=function(){mix=!mix;store.set("mix",mix);render()};
+$("shuf").onclick=function(){if(busy)return;phase="study";missing=[];shuffle(order);msg.textContent="Cards shuffled!";render()};
+$("snd").onclick=function(){sound=!sound;store.set("sound",sound);if(!sound)try{speechSynthesis.cancel()}catch(e){}render()};
+$("reset").onclick=resetAll;
+$("full").onclick=function(){try{var d=document;if(d.fullscreenElement)d.exitFullscreen();else d.documentElement.requestFullscreen().catch(function(){})}catch(e){}};
+sel.onchange=function(){setKey=sel.value;store.set("set",setKey);resetAll()};
+document.querySelectorAll(".team button").forEach(function(b){b.onclick=function(){
+  var t=+b.getAttribute("data-t"),d=+b.getAttribute("data-d");teams[t].s=Math.max(0,teams[t].s+d);store.set("teams",teams);
+  if(d>0)tone(t?600:500,.18,"triangle");render()}});
+[0,1].forEach(function(i){$("t"+i).addEventListener("input",function(){teams[i].name=this.value;store.set("teams",teams)})});
+document.addEventListener("keydown",function(e){
+  var tag=(e.target.tagName||"").toLowerCase();if(tag==="input"||tag==="select")return;
+  if(e.key===" "||e.key==="Enter"){if(tag==="button"&&e.target!==main&&e.key==="Enter")return;e.preventDefault();step()}
+  else if(e.key==="1"||e.key==="2"||e.key==="3"){n=+e.key;store.set("n",n);render()}
+  else if(e.key==="f"||e.key==="F"){$("full").click()}
+});
+render();
+})();
+</script>
+
+</body>
+</html>

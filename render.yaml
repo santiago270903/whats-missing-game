@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: whats-missing-game
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .
